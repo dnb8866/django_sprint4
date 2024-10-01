@@ -7,7 +7,7 @@ class ProfileEditForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email']
+        fields = ('first_name', 'last_name', 'username', 'email')
 
 
 class PostForm(forms.ModelForm):
@@ -17,11 +17,11 @@ class PostForm(forms.ModelForm):
             'pub_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
         model = Post
-        fields = ['title', 'text', 'location', 'category', 'pub_date', 'image']
+        exclude = ('author', 'is_published')
 
 
 class CommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
-        fields = ['text']
+        fields = ('text',)

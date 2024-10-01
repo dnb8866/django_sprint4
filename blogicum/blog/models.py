@@ -100,7 +100,7 @@ class Post(PublishedModel):
         verbose_name_plural = 'Публикации'
 
     def get_absolute_url(self):
-        return reverse('blog:post_detail', kwargs={'post_id': self.pk})
+        return reverse('blog:post_detail', args=[self.pk])
 
     def __repr__(self):
         return (f'{self.id=}, '
@@ -113,11 +113,11 @@ class Post(PublishedModel):
 
 
 class Comment(PublishedModel):
-    text = models.TextField(verbose_name='Текст комментария')
+    text = models.TextField(verbose_name='Текст')
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name='Автор публикации'
+        verbose_name='Автор комментария'
     )
     post = models.ForeignKey(
         Post,
