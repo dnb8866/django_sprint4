@@ -15,33 +15,32 @@ OBJECTS_PER_PAGE = 10
 SUCCESS_URL = reverse_lazy('blog:index')
 
 
-def get_objects(
-        objects: Manager = Post.objects,
+def get_posts(
+        posts: Manager = Post.objects,
         select_related: bool = True,
         published: bool = True,
         count_comments: bool = True
 ) -> Manager:
     """Return posts."""
-    ordering = objects.model._meta.ordering
     if select_related:
-        objects = objects.select_related(
+        posts = posts.select_related(
             'category',
             'author',
             'location'
         )
     if published:
-        objects = objects.filter(
+        posts = posts.filter(
             is_published=True,
             pub_date__lte=timezone.now(),
             category__is_published=True
         )
     if count_comments:
-        objects = objects.annotate(
+        posts = posts.annotate(
             comment_count=Count('comments')
         ).order_by(
-            ordering[0] if ordering else 'pk'
+            *posts.model._meta.ordering
         )
-    return objects
+    return posts
 
 
 def get_paginator(
@@ -57,7 +56,7 @@ def get_paginator(
 def index(request):
     """Main page for blog. Views all blog posts."""
     return render(request, 'blog/index.html', {
-        'page_obj': get_paginator(request, get_objects()),
+        'page_obj': get_paginator(request, get_posts()),
     })
 
 
@@ -66,7 +65,7 @@ def show_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     if post.author.id != request.user.id:
         post = get_object_or_404(
-            get_objects(
+            get_posts(
                 select_related=False,
                 count_comments=False
             ),
@@ -137,7 +136,7 @@ def show_category(request, category_slug):
         'category': category,
         'page_obj': get_paginator(
             request,
-            get_objects(category.posts)
+            get_posts(category.posts)
         )
     })
 
@@ -145,7 +144,7 @@ def show_category(request, category_slug):
 def show_profile(request, username):
     """View user's profile with posts."""
     author = get_object_or_404(User, username=username)
-    posts = get_objects(
+    posts = get_posts(
         author.posts,
         published=False if request.user == author else True
     )
