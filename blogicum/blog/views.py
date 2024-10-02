@@ -50,7 +50,7 @@ def get_paginator(
 ) -> Paginator:
     """Return paginator."""
     return (Paginator(model_objects, per_page)
-            .get_page(request.GET.get('paginator')))
+            .get_page(request.GET.get('page')))
 
 
 def index(request):
