@@ -9,7 +9,7 @@ urlpatterns = [
          include(
              [
                  path('edit/', views.edit_profile, name='edit_profile'),
-                 path('<slug:username>/', views.profile, name='profile')
+                 path('<slug:username>/', views.show_profile, name='profile')
              ]
          )
          ),
@@ -43,7 +43,7 @@ urlpatterns = [
                  ),
                  path(
                      '<int:post_id>/',
-                     views.post,
+                     views.show_post,
                      name='post_detail'
                  ),
                  path(
@@ -55,7 +55,7 @@ urlpatterns = [
          )),
     path(
         'category/<slug:category_slug>/',
-        views.category,
+        views.show_category,
         name='category_posts'
     ),
     path('', views.index, name='index'),

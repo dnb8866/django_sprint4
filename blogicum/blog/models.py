@@ -127,6 +127,5 @@ class Comment(PublishedModel):
 
     class Meta:
         default_related_name = 'comments'
-        ordering = ('-created_at',)
         verbose_name = 'комментарий'
         verbose_name_plural = 'Комментарии'
