@@ -37,8 +37,8 @@ def get_posts(
     if count_comments:
         posts = posts.annotate(
             comment_count=Count('comments')
-        )
-    return posts.order_by('-pub_date')
+        ).order_by('-pub_date')
+    return posts
 
 
 def get_paginator(
@@ -144,10 +144,8 @@ def show_profile(request, username):
     author = get_object_or_404(User, username=username)
     posts = get_posts(
         author.posts,
-        published=False
+        published=False if request.user == author else True
     )
-    if request.user != author:
-        posts = posts.filter(is_published=True)
     return render(request, 'blog/profile.html', {
         'profile': author,
         'page_obj': get_paginator(request, posts)
@@ -174,8 +172,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
-        form.instance.post = post
+        form.instance.post = get_object_or_404(Post, pk=self.kwargs['post_id'])
         return super().form_valid(form)
 
     def get_success_url(self):
