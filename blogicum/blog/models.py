@@ -33,7 +33,7 @@ class Category(PublishedModel):
     )
 
     class Meta:
-        ordering = ('title', 'created_at')
+        ordering = ('title',)
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
 
@@ -51,7 +51,7 @@ class Location(PublishedModel):
     name = models.CharField(max_length=256, verbose_name='Название места')
 
     class Meta:
-        ordering = ('name', 'created_at')
+        ordering = ('name',)
         verbose_name = 'местоположение'
         verbose_name_plural = 'Местоположения'
 
@@ -92,12 +92,14 @@ class Post(PublishedModel):
         verbose_name='Категория',
     )
     image = models.ImageField(
-        upload_to='post_images', blank=True, verbose_name='Изображение'
+        upload_to='post_images',
+        blank=True,
+        verbose_name='Изображение'
     )
 
     class Meta:
         default_related_name = 'posts'
-        ordering = ('-pub_date', 'title')
+        ordering = ('-pub_date',)
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
 
@@ -128,7 +130,7 @@ class Comment(PublishedModel):
     )
 
     class Meta:
-        ordering = ('created_at', 'text')
+        ordering = ('created_at',)
         default_related_name = 'comments'
         verbose_name = 'комментарий'
         verbose_name_plural = 'Комментарии'

@@ -15,30 +15,33 @@ OBJECTS_PER_PAGE = 10
 SUCCESS_URL = reverse_lazy('blog:index')
 
 
-def get_posts(
-        posts: Manager = Post.objects,
+def get_objects(
+        objects: Manager = Post.objects,
         select_related: bool = True,
         published: bool = True,
         count_comments: bool = True
 ) -> Manager:
     """Return posts."""
+    ordering = objects.model._meta.ordering
     if select_related:
-        posts = posts.select_related(
+        objects = objects.select_related(
             'category',
             'author',
             'location'
         )
     if published:
-        posts = posts.filter(
+        objects = objects.filter(
             is_published=True,
             pub_date__lte=timezone.now(),
             category__is_published=True
         )
     if count_comments:
-        posts = posts.annotate(
+        objects = objects.annotate(
             comment_count=Count('comments')
-        ).order_by('-pub_date')
-    return posts
+        ).order_by(
+            ordering[0] if ordering else 'pk'
+        )
+    return objects
 
 
 def get_paginator(
@@ -54,7 +57,7 @@ def get_paginator(
 def index(request):
     """Main page for blog. Views all blog posts."""
     return render(request, 'blog/index.html', {
-        'page_obj': get_paginator(request, get_posts()),
+        'page_obj': get_paginator(request, get_objects()),
     })
 
 
@@ -63,7 +66,7 @@ def show_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     if post.author.id != request.user.id:
         post = get_object_or_404(
-            get_posts(
+            get_objects(
                 select_related=False,
                 count_comments=False
             ),
@@ -134,7 +137,7 @@ def show_category(request, category_slug):
         'category': category,
         'page_obj': get_paginator(
             request,
-            get_posts(category.posts)
+            get_objects(category.posts)
         )
     })
 
@@ -142,7 +145,7 @@ def show_category(request, category_slug):
 def show_profile(request, username):
     """View user's profile with posts."""
     author = get_object_or_404(User, username=username)
-    posts = get_posts(
+    posts = get_objects(
         author.posts,
         published=False if request.user == author else True
     )
