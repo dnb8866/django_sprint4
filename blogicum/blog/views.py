@@ -6,7 +6,7 @@ from django.db.models.manager import Manager
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
-from django.views.generic import CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView, UpdateView, DeleteView, TemplateView, ListView
 
 from blog.forms import ProfileEditForm, PostForm, CommentForm
 from blog.models import Post, Category, User, Comment
@@ -53,11 +53,13 @@ def get_paginator(
             .get_page(request.GET.get('page')))
 
 
-def index(request):
-    """Main page for blog. Views all blog posts."""
-    return render(request, 'blog/index.html', {
-        'page_obj': get_paginator(request, get_posts()),
-    })
+class IndexListView(ListView):
+    model = Post
+    template_name = 'blog/index.html'
+    paginate_by = OBJECTS_PER_PAGE
+
+    def get_queryset(self):
+        return get_posts()
 
 
 def show_post(request, post_id):

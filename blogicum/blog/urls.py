@@ -58,5 +58,5 @@ urlpatterns = [
         views.show_category,
         name='category_posts'
     ),
-    path('', views.index, name='index'),
+    path('', views.IndexListView.as_view(), name='index'),
 ]
